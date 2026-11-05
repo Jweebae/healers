@@ -142,6 +142,25 @@
     .savebar .btn { padding: 10px 22px; font-size: 16px; }
     .savebar .saved { margin: 0; flex: 1; }
     .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+    /* history, activity, edit form, insights */
+    .topw { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--muted, #667); }
+    .topw b { color: var(--ink); }
+    .topw span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+    .hist { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+    .hist li { border-inline-start: 3px solid var(--line); padding: 2px 10px; font-size: 14px; }
+    .hist li.created { border-color: #2e9d5b; }
+    .hist li.deleted { border-color: var(--red); }
+    .hist .meta { font-size: 12px; color: var(--muted, #667); }
+    .hist .chg { display: block; }
+    .repeat { font-size: 14px; margin: 0; }
+    .repeat.warn { color: #9a5b00; font-weight: 700; }
+    .edit .full { grid-column: 1 / -1; }
+    .row-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .danger { border: 1px solid #f3c3bf; }
+    .danger .btn { background: var(--red); color: #fff; }
+    .danger .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .act-link { cursor: pointer; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -153,6 +172,7 @@
       <nav class="nav" id="nav" hidden>
         <a href="#" id="nav-orders" data-t="navOrders"></a>
         <a href="#settings" id="nav-settings" data-t="navSettings"></a>
+        <a href="#activity" id="nav-activity" data-t="navActivity"></a>
       </nav>
       <div class="langs" role="group" aria-label="Language">
         <button type="button" data-lang="ar">AR</button>
@@ -193,6 +213,7 @@
     <button class="btn line" id="export" type="button" data-t="export"></button>
   </div>
   <div class="stats" id="stats"></div>
+  <div class="topw" id="topw"></div>
   <div class="tabs" id="tabs" role="toolbar"></div>
   <div class="table-box">
     <table>
@@ -217,6 +238,11 @@
 <!-- ============ ONE ORDER ============ -->
 <main class="wrap" id="detail-view" hidden>
   <div class="detail" id="detail"></div>
+</main>
+
+<!-- ============ ACTIVITY ============ -->
+<main class="wrap" id="activity-view" hidden>
+  <div id="activity"></div>
 </main>
 
 <!-- ============ SETTINGS ============ -->
@@ -470,6 +496,40 @@ const LANG_KEY = "healers_admin_lang";
 let lang = "ar";
 try { lang = localStorage.getItem(LANG_KEY) || "ar"; } catch (_) {}
 if (!T[lang]) lang = "ar";
+/* Texts for the history, activity and editing features. */
+Object.assign(T.ar, {
+  navActivity: "السجل", actTitle: "سجل النشاط", actSub: "كل عملية على الطلبات: من قام بها ومتى.",
+  actEmpty: "لا يوجد نشاط بعد.", noLogs: "السجل غير مفعّل بعد في قاعدة البيانات.",
+  histTitle: "تاريخ الطلب", editTitle: "تعديل بيانات الطلب", editSave: "حفظ التعديلات", editCancel: "إلغاء",
+  repeat: n => `⚠️ زبون متكرر: ${n} طلب(ات) سابقة بنفس الرقم`, firstOrder: "أول طلب لهذا الرقم",
+  copyCourier: "📋 نسخ لشركة التوصيل", copied: "تم النسخ", a_created: "أنشأ الطلب", a_updated: "عدّل", a_deleted: "حذف الطلب",
+  byWebsite: "الموقع", resetTitle: "إعادة ترقيم الطلبات",
+  resetHint: "يبدأ الترقيم من جديد من #1. متاح فقط بعد حذف كل الطلبات.", resetBtn: "إعادة الترقيم من #1",
+  resetSure: "اضغط مرة أخرى للتأكيد", resetDone: "سيكون الطلب القادم رقم #1", resetBlocked: n => `احذف الطلبات أولا (${n} متبقية)`,
+  topWilayas: "أكثر الولايات طلبا:", badPhone: "رقم الهاتف غير صحيح", badQty: "الكمية غير صحيحة", deletedOrder: "طلب محذوف",
+});
+Object.assign(T.fr, {
+  navActivity: "Historique", actTitle: "Historique d'activité", actSub: "Chaque action sur les commandes : qui et quand.",
+  actEmpty: "Aucune activité pour le moment.", noLogs: "L'historique n'est pas encore activé dans la base.",
+  histTitle: "Historique de la commande", editTitle: "Modifier la commande", editSave: "Enregistrer", editCancel: "Annuler",
+  repeat: n => `⚠️ Client récurrent : ${n} commande(s) avec ce numéro`, firstOrder: "Première commande de ce numéro",
+  copyCourier: "📋 Copier pour le livreur", copied: "Copié", a_created: "a créé la commande", a_updated: "a modifié", a_deleted: "a supprimé la commande",
+  byWebsite: "Site web", resetTitle: "Renuméroter les commandes",
+  resetHint: "Repart de #1. Possible uniquement quand toutes les commandes sont supprimées.", resetBtn: "Repartir de #1",
+  resetSure: "Cliquez encore pour confirmer", resetDone: "La prochaine commande sera #1", resetBlocked: n => `Supprimez d'abord les commandes (${n} restantes)`,
+  topWilayas: "Wilayas les plus actives :", badPhone: "Numéro invalide", badQty: "Quantité invalide", deletedOrder: "commande supprimée",
+});
+Object.assign(T.en, {
+  navActivity: "Activity", actTitle: "Activity log", actSub: "Every action on orders: who did it and when.",
+  actEmpty: "No activity yet.", noLogs: "History is not switched on in the database yet.",
+  histTitle: "Order history", editTitle: "Edit order details", editSave: "Save changes", editCancel: "Cancel",
+  repeat: n => `⚠️ Repeat customer: ${n} earlier order(s) from this number`, firstOrder: "First order from this number",
+  copyCourier: "📋 Copy for courier", copied: "Copied", a_created: "created the order", a_updated: "changed", a_deleted: "deleted the order",
+  byWebsite: "Website", resetTitle: "Restart order numbers",
+  resetHint: "Starts again at #1. Only possible once every order is deleted.", resetBtn: "Restart at #1",
+  resetSure: "Click again to confirm", resetDone: "The next order will be #1", resetBlocked: n => `Delete the orders first (${n} left)`,
+  topWilayas: "Busiest wilayas:", badPhone: "Invalid phone number", badQty: "Invalid quantity", deletedOrder: "deleted order",
+});
 const t = () => T[lang];
 
 function applyLang() {
@@ -534,6 +594,9 @@ function showView(v) {
   $("#list-view").hidden = v !== "list";
   $("#detail-view").hidden = v !== "detail";
   $("#settings-view").hidden = v !== "settings";
+  $("#activity-view").hidden = v !== "activity";
+  $("#nav-activity").toggleAttribute("aria-current", v === "activity");
+  if (v === "activity") $("#nav-activity").setAttribute("aria-current", "page");
   $("#refresh").hidden = $("#logout").hidden = $("#nav").hidden = v === "login";
   $("#nav-orders").toggleAttribute("aria-current", v === "list" || v === "detail");
   if (v === "list" || v === "detail") $("#nav-orders").setAttribute("aria-current", "page");
@@ -544,6 +607,7 @@ function route() {
   if (!signedIn) return showView("login");
   const m = /^#o=(\d+)$/.exec(location.hash);
   if (m) { showView("detail"); renderDetail(Number(m[1])); window.scrollTo(0, 0); }
+  else if (location.hash === "#activity") { showView("activity"); renderActivity(); }
   else if (location.hash === "#settings") { showView("settings"); if (!settingsDirty) fillSettings(); }
   else { showView("list"); renderList(); }
 }
@@ -633,6 +697,7 @@ const visibleOrders = () => orders.filter(inPeriod).filter(o => (currentTab === 
 function renderList() {
   const period = orders.filter(inPeriod);
   renderStats(period);
+  renderTopWilayas(period);
   renderTabs(period);
   const shown = visibleOrders();
   const tbody = $("#rows");
@@ -797,6 +862,146 @@ function renderDetail(id) {
         el("div", { class: "full" }, el("label", { for: "d-notes", text: t().notes }), notes)),
       savedEl)
   );
+  renderDetailExtras(o, box, update);
+}
+
+/* =================================================================
+   INSIGHTS, EDITING, HISTORY, ACTIVITY
+   ================================================================= */
+function renderTopWilayas(p) {
+  const box = $("#topw");
+  box.textContent = "";
+  const counts = {};
+  p.forEach(o => { const w = o.wilaya.replace(/^\d+ - /, ""); counts[w] = (counts[w] || 0) + 1; });
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  if (!top.length) return;
+  box.append(el("b", { text: t().topWilayas }), ...top.map(([w, n]) => el("span", {}, w + " · ", num(n))));
+}
+
+const FIELD_LABEL = () => ({
+  customer_name: t().c_name, business_name: t().f_business, phone: t().f_phone, wilaya: t().f_wilaya, commune: t().f_commune,
+  delivery_type: t().f_delivery, address: t().f_address, customer_note: t().f_note, quantity: t().f_qty, unit_price: t().f_unit,
+  items_total: t().f_items, delivery_fee: t().feeLbl, total_price: t().f_total, status: t().status, tracking_number: t().tracking, notes: t().notes,
+});
+function showValue(key, v) {
+  if (v === null || v === undefined || v === "") return "—";
+  if (key === "status") return t().s[v] || v;
+  if (key === "delivery_type") return v === "desk" ? t().desk : t().home;
+  return String(v);
+}
+function logLine(log, withOrder) {
+  const who = log.actor === "website" ? t().byWebsite : log.actor.replace(/@healers\.dz$/, "");
+  const li = el("li", { class: log.action });
+  const head = el("div", {}, el("b", { text: who }), " " + t()["a_" + log.action]);
+  if (withOrder) {
+    const exists = orders.some(o => o.id === log.order_id);
+    head.append(" ", exists
+      ? el("a", { class: "act-link", text: "#" + log.order_id, onclick: () => { location.hash = "o=" + log.order_id; } })
+      : num("#" + log.order_id));
+    if (log.action === "deleted" && log.changes.customer_name) head.append(` (${t().deletedOrder}: ${log.changes.customer_name} · ${log.changes.phone})`);
+  }
+  li.append(head);
+  if (log.action === "updated") {
+    const labels = FIELD_LABEL();
+    Object.entries(log.changes).forEach(([k, c]) => {
+      li.append(el("span", { class: "chg", dir: "auto", text: `${labels[k] || k}: ${showValue(k, c.from)} → ${showValue(k, c.to)}` }));
+    });
+  }
+  li.append(el("div", { class: "meta" }, num(when(log.created_at))));
+  return li;
+}
+
+function renderDetailExtras(o, box, update) {
+  // repeat customer + courier copy
+  const earlier = orders.filter(x => x.phone === o.phone && x.id !== o.id).length;
+  const copyBtn = el("button", { type: "button", class: "btn line", text: t().copyCourier });
+  copyBtn.addEventListener("click", async () => {
+    const lines = [o.customer_name, o.phone, `${o.wilaya} - ${o.commune}`,
+      o.delivery_type === "desk" ? t().deskLong : `${t().homeLong}: ${o.address}`,
+      `${t().f_qty}: ${o.quantity}`, `${t().f_total}: ${o.total_price} ${t().cur}`];
+    try { await navigator.clipboard.writeText(lines.join("\n")); toast(t().copied); } catch { toast(lines.join(" | ")); }
+  });
+  box.append(el("div", { class: "panel" },
+    el("p", { class: earlier ? "repeat warn" : "repeat", text: earlier ? t().repeat(earlier) : t().firstOrder }),
+    el("div", { class: "row-btns" }, copyBtn)));
+
+  // full edit of the customer's details, quantity and price
+  const f = {};
+  const field = (key, input, full) => {
+    f[key] = input;
+    input.id = "e-" + key;
+    return el("div", full ? { class: "full" } : {}, el("label", { for: input.id, text: FIELD_LABEL()[key] }), input);
+  };
+  const inp = (key, attrs = {}) => el("input", { value: o[key] ?? "", ...attrs });
+  const dsel = el("select", {});
+  [["home", t().homeLong], ["desk", t().deskLong]].forEach(([v, label]) => { const op = new Option(label, v); op.selected = o.delivery_type === v; dsel.add(op); });
+  const note = el("textarea", {}); note.value = o.customer_note ?? "";
+  const msg = el("div", { class: "saved", role: "status" });
+  const saveBtn = el("button", { type: "button", class: "btn", text: t().editSave });
+  saveBtn.addEventListener("click", async () => {
+    const phone = f.phone.value.trim();
+    const qty = Number(f.quantity.value);
+    const unit = Number(f.unit_price.value);
+    if (!/^0[567]\d{8}$/.test(phone)) { msg.className = "saved err"; msg.textContent = t().badPhone; return; }
+    if (!Number.isInteger(qty) || qty < 1 || !Number.isFinite(unit) || unit < 0) { msg.className = "saved err"; msg.textContent = t().badQty; return; }
+    const items = Math.round(qty * unit);
+    const changes = {
+      customer_name: f.customer_name.value.trim(), business_name: f.business_name.value.trim(), phone,
+      wilaya: f.wilaya.value.trim(), commune: f.commune.value.trim(), delivery_type: dsel.value,
+      address: dsel.value === "desk" ? "" : f.address.value.trim(), customer_note: note.value.trim(),
+      quantity: qty, unit_price: Math.round(unit), items_total: items, total_price: items + (o.delivery_fee ?? 0),
+    };
+    saveBtn.disabled = true;
+    const ok = await save(o, changes, msg);
+    saveBtn.disabled = false;
+    if (ok) renderDetail(o.id);
+  });
+  box.append(el("div", { class: "panel" },
+    el("h3", { text: t().editTitle }),
+    el("div", { class: "edit" },
+      field("customer_name", inp("customer_name")), field("business_name", inp("business_name")),
+      field("phone", inp("phone", { dir: "ltr", inputmode: "tel" })), field("delivery_type", dsel),
+      field("wilaya", inp("wilaya")), field("commune", inp("commune")),
+      field("address", inp("address"), true),
+      field("quantity", inp("quantity", { type: "number", min: "1", inputmode: "numeric" })),
+      field("unit_price", inp("unit_price", { type: "number", min: "0", inputmode: "numeric" })),
+      field("customer_note", note, true)),
+    el("div", { class: "row-btns" }, saveBtn, msg)));
+
+  // history of this order
+  const list = el("ul", { class: "hist" });
+  const histPanel = el("div", { class: "panel" }, el("h3", { text: t().histTitle }), list);
+  box.append(histPanel);
+  db.from("order_logs").select("*").eq("order_id", o.id).order("created_at", { ascending: false }).then(({ data, error }) => {
+    if (error) { list.replaceWith(el("p", { class: "muted", text: t().noLogs })); return; }
+    if (!data.length) { list.replaceWith(el("p", { class: "muted", text: t().actEmpty })); return; }
+    data.forEach(l => list.append(logLine(l, false)));
+  });
+}
+
+async function renderActivity() {
+  const box = $("#activity");
+  box.textContent = "";
+  const list = el("ul", { class: "hist" });
+  box.append(el("div", { class: "panel" }, el("h2", { text: t().actTitle }), el("p", { class: "muted", text: t().actSub }), list));
+
+  // restart numbering, only when there is nothing left to renumber over
+  const left = orders.length;
+  let armed = false;
+  const resetBtn = el("button", { type: "button", class: "btn", text: left ? t().resetBlocked(left) : t().resetBtn });
+  resetBtn.disabled = left > 0;
+  resetBtn.addEventListener("click", async () => {
+    if (!armed) { armed = true; resetBtn.textContent = t().resetSure; setTimeout(() => { armed = false; resetBtn.textContent = t().resetBtn; }, 4000); return; }
+    const { error } = await db.rpc("reset_order_numbering");
+    toast(error ? t().saveFail + error.message : t().resetDone);
+    armed = false; resetBtn.textContent = t().resetBtn;
+  });
+  box.append(el("div", { class: "panel danger" }, el("h3", { text: t().resetTitle }), el("p", { class: "muted", text: t().resetHint }), resetBtn));
+
+  const { data, error } = await db.from("order_logs").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) { list.replaceWith(el("p", { class: "muted", text: t().noLogs })); return; }
+  if (!data.length) { list.replaceWith(el("p", { class: "muted", text: t().actEmpty })); return; }
+  data.forEach(l => list.append(logLine(l, true)));
 }
 
 /* =================================================================
