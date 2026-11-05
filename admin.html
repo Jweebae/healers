@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#102018">
+  <title>HEALERS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #102018; --accent: #4f7d61; --accent2: #dce9df; --yellow: #c9e4a6;
+      --red: #d92d20; --green: #16803c; --bg: #f4f6f3; --ink: #172019; --muted: #5f6b63; --line: #e1e7e2;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; font-family: "Cairo", Tahoma, Arial, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.55; }
+    button, input, select, textarea { font: inherit; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 14px; }
+    bdi.n { direction: ltr; unicode-bidi: isolate; }
+
+    /* header */
+    header { position: sticky; top: 0; z-index: 10; background: var(--navy); color: #fff; }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 56px; flex-wrap: wrap; padding-block: 6px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 2px; }
+    .brand small { letter-spacing: 0; font-weight: 600; opacity: .7; }
+    .hbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .nav { display: flex; border: 1px solid #ffffff44; border-radius: 9px; overflow: hidden; }
+    .nav a { color: #fff; text-decoration: none; padding: 4px 12px; font-weight: 700; font-size: 14px; }
+    .nav a[aria-current="page"] { background: var(--yellow); color: var(--navy); }
+    .langs { display: flex; border: 1px solid #ffffff44; border-radius: 9px; overflow: hidden; }
+    .langs button { background: transparent; color: #fff; border: 0; padding: 4px 10px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .langs button[aria-pressed="true"] { background: #ffffff; color: var(--navy); }
+    .btn { border: 0; border-radius: 9px; padding: 6px 14px; cursor: pointer; font-weight: 700; background: var(--yellow); color: var(--navy); }
+    .btn.ghost { background: transparent; color: #fff; border: 1px solid #ffffff55; }
+    .btn.dark { background: var(--navy); color: #fff; }
+    .btn.line { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+    .btn.danger { background: #fff; color: var(--red); border: 1.5px solid #f3c3bf; }
+    .btn:disabled { opacity: .6; cursor: wait; }
+
+    /* login */
+    .login { max-width: 380px; margin: 60px auto; background: #fff; border-radius: 16px; padding: 26px 20px; border: 1px solid var(--line); }
+    .login h1 { margin: 0 0 4px; font-size: 22px; }
+    .login p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+    label { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 4px; }
+    input, select, textarea { width: 100%; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); }
+    input:focus, select:focus, textarea:focus { outline: 3px solid #4f7d6144; border-color: var(--accent); }
+    .login .btn { width: 100%; margin-top: 18px; padding: 11px; font-size: 17px; background: var(--navy); color: #fff; }
+    .msg { margin: 10px 0 0; font-weight: 600; font-size: 14px; color: var(--red); }
+
+    /* toolbar + stats */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 10px; }
+    .toolbar select { width: auto; flex: 0 1 180px; }
+    .toolbar input { flex: 1 1 220px; width: auto; }
+    .toolbar .btn { flex: 0 0 auto; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 720px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+    .stat b { display: block; font-size: 22px; color: var(--navy); line-height: 1.2; }
+    .stat small { color: var(--muted); font-size: 13px; }
+    .stat .sub { color: var(--muted); font-size: 12px; }
+    .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 8px; }
+    .tab { white-space: nowrap; border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 3px 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--ink); }
+    .tab[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .tab .c { opacity: .7; margin-inline-start: 4px; }
+    .closed-banner { background: #fff7e6; border: 1px solid #f3d9a4; color: #7a4b00; border-radius: 12px; padding: 10px 14px; font-weight: 700; margin-top: 14px; display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .closed-banner a { color: inherit; }
+
+    /* table */
+    .table-box { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; margin-bottom: 40px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: start; font-size: 12px; color: var(--muted); font-weight: 700; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; background: #fafcfa; }
+    td { padding: 9px 10px; border-bottom: 1px solid #eef2ee; white-space: nowrap; vertical-align: middle; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover, tbody tr:focus { background: #f1f7f2; outline: none; }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.name { font-weight: 700; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+    td.name small { display: block; font-weight: 600; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
+    td.place { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    td.muted { color: var(--muted); font-size: 12px; }
+    .empty { text-align: center; color: var(--muted); padding: 36px 0; }
+    @media (max-width: 760px) { .opt { display: none; } th, td { padding: 9px 7px; } td.place { max-width: 120px; } td.name { max-width: 110px; } }
+
+    .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 999px; white-space: nowrap; }
+    .s-new { background: #cffafe; color: #155e75; }
+    .s-no_answer { background: #fef3c7; color: #92400e; }
+    .s-confirmed { background: #dbeafe; color: #1e40af; }
+    .s-shipped { background: #ede9fe; color: #5b21b6; }
+    .s-delivered { background: #dcfce7; color: #166534; }
+    .s-returned, .s-cancelled { background: #fee2e2; color: #991b1b; }
+    .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 8px; border-radius: 999px; }
+    .pill.home { background: #e0f2fe; } .pill.desk { background: #fef3c7; }
+
+    /* detail */
+    .detail, .settings { max-width: 760px; margin: 16px auto 40px; }
+    .back { background: none; border: 0; color: var(--navy); font-weight: 800; cursor: pointer; padding: 4px 0; font-size: 15px; }
+    .panel { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 10px; }
+    .panel h2 { margin: 0; font-size: 22px; }
+    .panel h3 { margin: 0 0 4px; font-size: 18px; }
+    .panel .hint { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .info { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 14px 0 4px; font-size: 15px; }
+    .info dt { color: var(--muted); }
+    .info dd { margin: 0; font-weight: 600; word-break: break-word; }
+    html[dir="ltr"] .info dd { text-align: left; }
+    html[dir="rtl"] .info dd { text-align: right; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .actions a, .actions button { text-decoration: none; border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 10px; padding: 7px 14px; font-weight: 700; cursor: pointer; }
+    .actions a:hover, .actions button:hover { border-color: var(--accent); }
+    .actions .del { color: var(--red); border-color: #f3c3bf; margin-inline-start: auto; }
+    .edit { display: grid; gap: 4px 12px; grid-template-columns: 1fr 1fr; }
+    .edit .full { grid-column: 1 / -1; }
+    .edit textarea { min-height: 80px; resize: vertical; }
+    .saved { font-size: 13px; color: var(--green); font-weight: 600; min-height: 20px; margin-top: 8px; }
+    .saved.err { color: var(--red); }
+    .toast { position: fixed; bottom: 16px; inset-inline: 16px; margin: auto; max-width: 360px; background: var(--ink); color: #fff; padding: 10px 14px; border-radius: 10px; text-align: center; font-weight: 600; z-index: 50; }
+
+    /* settings */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 12px; }
+    @media (max-width: 600px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+    .unit { position: relative; }
+    .unit input { padding-inline-end: 44px; }
+    .unit span { position: absolute; inset-inline-end: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; font-weight: 700; pointer-events: none; }
+    .switch { display: flex; align-items: center; gap: 12px; margin-top: 8px; cursor: pointer; font-weight: 800; font-size: 16px; }
+    .switch input { width: 46px; height: 26px; appearance: none; -webkit-appearance: none; background: #cfd6d0; border-radius: 99px; position: relative; cursor: pointer; border: 0; padding: 0; flex: 0 0 46px; transition: background .15s; }
+    .switch input::after { content: ""; position: absolute; top: 3px; inset-inline-start: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: inset-inline-start .15s; box-shadow: 0 1px 3px #0003; }
+    .switch input:checked { background: var(--green); }
+    .switch input:checked::after { inset-inline-start: 23px; }
+    .tier-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; margin-top: 8px; }
+    .tier-row label { margin-top: 0; font-size: 12px; color: var(--muted); }
+    .tier-row button { height: 40px; width: 40px; border-radius: 9px; border: 1.5px solid #f3c3bf; background: #fff; color: var(--red); font-weight: 900; cursor: pointer; }
+    .preview { background: var(--accent2); border-radius: 12px; padding: 12px 14px; margin-top: 12px; font-size: 14px; }
+    .preview table { font-size: 14px; background: transparent; }
+    .preview td { padding: 3px 0; border: 0; white-space: normal; cursor: default; }
+    .preview td:last-child { text-align: end; font-weight: 800; }
+    .warn { color: #92400e; background: #fef3c7; border-radius: 9px; padding: 8px 10px; font-size: 13px; font-weight: 700; margin-top: 10px; }
+    .warn:empty { display: none; }
+    .savebar { position: sticky; bottom: 0; background: #ffffffee; backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-top: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .savebar .btn { padding: 10px 22px; font-size: 16px; }
+    .savebar .saved { margin: 0; flex: 1; }
+    .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">HEALERS <small data-t="admin"></small></div>
+    <div class="hbtns">
+      <nav class="nav" id="nav" hidden>
+        <a href="#" id="nav-orders" data-t="navOrders"></a>
+        <a href="#settings" id="nav-settings" data-t="navSettings"></a>
+      </nav>
+      <div class="langs" role="group" aria-label="Language">
+        <button type="button" data-lang="ar">AR</button>
+        <button type="button" data-lang="fr">FR</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <button class="btn" id="refresh" type="button" data-t="refresh" hidden></button>
+      <button class="btn ghost" id="logout" type="button" data-t="logout" hidden></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LOGIN ============ -->
+<section class="login" id="login-view" hidden>
+  <h1 data-t="login"></h1>
+  <p data-t="loginSub"></p>
+  <form id="login-form">
+    <label for="email" data-t="email"></label>
+    <input id="email" type="text" autocomplete="username" required dir="ltr">
+    <label for="password" data-t="password"></label>
+    <input id="password" type="password" autocomplete="current-password" required dir="ltr">
+    <button class="btn" type="submit" id="login-btn" data-t="enter"></button>
+    <p class="msg" id="login-msg" role="alert"></p>
+  </form>
+</section>
+
+<!-- ============ ORDERS LIST ============ -->
+<main class="wrap" id="list-view" hidden>
+  <div class="closed-banner" id="closed-banner" hidden><span data-t="closedBanner"></span><a href="#settings" data-t="openSettings"></a></div>
+  <div class="toolbar">
+    <select id="period" aria-label="period">
+      <option value="1" data-t="today"></option>
+      <option value="7" data-t="d7" selected></option>
+      <option value="30" data-t="d30"></option>
+      <option value="0" data-t="all"></option>
+    </select>
+    <input id="search" type="search" data-tp="search">
+    <button class="btn line" id="export" type="button" data-t="export"></button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="tabs" id="tabs" role="toolbar"></div>
+  <div class="table-box">
+    <table>
+      <thead><tr>
+        <th class="opt">#</th>
+        <th class="opt" data-t="c_date"></th>
+        <th data-t="c_name"></th>
+        <th data-t="c_phone"></th>
+        <th data-t="c_place"></th>
+        <th class="opt" data-t="c_delivery"></th>
+        <th class="opt" data-t="c_qty"></th>
+        <th class="opt" data-t="c_total"></th>
+        <th data-t="c_status"></th>
+        <th class="opt" data-t="c_tracking"></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty" data-t="empty" hidden></p>
+  </div>
+</main>
+
+<!-- ============ ONE ORDER ============ -->
+<main class="wrap" id="detail-view" hidden>
+  <div class="detail" id="detail"></div>
+</main>
+
+<!-- ============ SETTINGS ============ -->
+<main class="wrap" id="settings-view" hidden>
+  <form class="settings" id="settings-form" novalidate>
+
+    <div class="panel">
+      <h3 data-t="g_sales"></h3>
+      <label class="switch"><input type="checkbox" id="s-open"><span id="s-open-label"></span></label>
+      <div id="closed-msg-box">
+        <label for="s-closed" data-t="f_closedMsg"></label>
+        <input id="s-closed" maxlength="300">
+      </div>
+      <label for="s-announce" data-t="f_announce"></label>
+      <input id="s-announce" maxlength="200" data-tp="announcePh">
+    </div>
+
+    <div class="panel">
+      <h3 data-t="g_price"></h3>
+      <div class="grid2">
+        <div><label for="s-price" data-t="f_price"></label><div class="unit"><input id="s-price" type="number" min="1" inputmode="numeric" required><span data-t="cur"></span></div></div>
+        <div><label for="s-old" data-t="f_old"></label><div class="unit"><input id="s-old" type="number" min="1" inputmode="numeric" data-tp="optional"><span data-t="cur"></span></div></div>
+      </div>
+      <div class="grid3">
+        <div><label for="s-min" data-t="f_min"></label><input id="s-min" type="number" min="1" inputmode="numeric" required></div>
+        <div><label for="s-step" data-t="f_step"></label><input id="s-step" type="number" min="1" inputmode="numeric" required></div>
+        <div><label for="s-max" data-t="f_max"></label><input id="s-max" type="number" min="1" inputmode="numeric" required></div>
+      </div>
+      <p class="hint" data-t="stepHint"></p>
+    </div>
+
+    <div class="panel">
+      <h3 data-t="g_tiers"></h3>
+      <p class="hint" data-t="tiersHint"></p>
+      <div id="tiers"></div>
+      <div class="actions"><button type="button" id="add-tier" data-t="addTier"></button></div>
+      <div class="preview" id="preview"></div>
+      <p class="warn" id="warn"></p>
+    </div>
+
+    <div class="panel">
+      <h3 data-t="g_delivery"></h3>
+      <p class="hint" data-t="deliveryHint"></p>
+      <div class="grid2">
+        <div><label for="s-home" data-t="f_home"></label><div class="unit"><input id="s-home" type="number" min="0" inputmode="numeric" data-tp="atConfirm"><span data-t="cur"></span></div></div>
+        <div><label for="s-desk" data-t="f_desk"></label><div class="unit"><input id="s-desk" type="number" min="0" inputmode="numeric" data-tp="atConfirm"><span data-t="cur"></span></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 data-t="g_product"></h3>
+      <div class="grid2">
+        <div><label for="s-name" data-t="f_name"></label><input id="s-name" maxlength="80" required></div>
+        <div><label for="s-pack" data-t="f_pack"></label><input id="s-pack" maxlength="60"></div>
+      </div>
+      <label for="s-pixel" data-t="f_pixel"></label>
+      <input id="s-pixel" inputmode="numeric" dir="ltr" maxlength="20" data-tp="optional">
+      <p class="meta" id="s-updated"></p>
+    </div>
+
+    <div class="savebar">
+      <button class="btn dark" type="submit" id="s-save" data-t="saveSettings"></button>
+      <button class="btn line" type="button" id="s-reset" data-t="discard"></button>
+      <p class="saved" id="s-saved" role="status"></p>
+    </div>
+
+    <div class="panel">
+      <h3 data-t="g_account"></h3>
+      <p class="hint" id="acc-who"></p>
+      <div class="grid2">
+        <div><label for="pw1" data-t="newPw"></label><input id="pw1" type="password" autocomplete="new-password" dir="ltr" minlength="8"></div>
+        <div><label for="pw2" data-t="newPw2"></label><input id="pw2" type="password" autocomplete="new-password" dir="ltr" minlength="8"></div>
+      </div>
+      <div class="actions"><button type="button" id="pw-save" data-t="changePw"></button></div>
+      <p class="saved" id="pw-msg" role="status"></p>
+    </div>
+  </form>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = "https://sxijpjfydyhxilekqdvg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UsWS8WJsADtbbPURpMHG7w_m1jddZbw";
+const USER_DOMAIN = "@healers.dz";   // a username without "@" signs in as username@healers.dz
+const STATUS_KEYS = ["new", "no_answer", "confirmed", "shipped", "delivered", "returned", "cancelled"];
+
+/* =================================================================
+   TRANSLATIONS
+   ================================================================= */
+const T = {
+  ar: {
+    dir: "rtl", admin: "لوحة الإدارة", login: "تسجيل الدخول", loginSub: "هذه الصفحة خاصة بالإدارة.",
+    email: "اسم المستخدم", password: "كلمة السر", enter: "دخول",
+    badLogin: "اسم المستخدم أو كلمة السر غير صحيحة.", noAccess: "هذا الحساب ليس له صلاحية الدخول.",
+    navOrders: "الطلبات", navSettings: "الإعدادات",
+    refresh: "تحديث", logout: "خروج", updated: "تم التحديث", loadFail: "تعذر تحميل الطلبات: ",
+    today: "اليوم", d7: "آخر 7 أيام", d30: "آخر 30 يوم", all: "الكل", allTab: "الكل",
+    search: "بحث: اسم، محل، هاتف، بلدية، رقم الطلب…", export: "⬇ تصدير Excel",
+    closedBanner: "⚠ الطلبات متوقفة حالياً: الزبائن لا يستطيعون الطلب.", openSettings: "فتح الإعدادات",
+    st_orders: "عدد الطلبات", st_waiting: n => `${n} في انتظار الاتصال`,
+    st_conf: "نسبة التأكيد", st_confSub: (a, b) => `${a} مؤكد من ${b}`,
+    st_del: "نسبة التسليم", st_delSub: (a, b) => `${a} سُلّم، ${b} مرتجع`,
+    st_rev: "المداخيل (المُسلّمة فقط)", st_pieces: n => `${n} قارورة`,
+    c_date: "التاريخ", c_name: "الاسم", c_phone: "الهاتف", c_place: "الولاية / البلدية",
+    c_delivery: "التوصيل", c_qty: "الكمية", c_total: "المبلغ", c_status: "الحالة", c_tracking: "التتبع",
+    home: "منزل", desk: "مكتب", homeLong: "إلى المنزل / المحل", deskLong: "مكتب التوصيل (Stop desk)",
+    empty: "لا توجد طلبات هنا.", back: "→ رجوع إلى الطلبات", notFound: "هذا الطلب غير موجود.",
+    call: "📞 اتصال", whatsapp: "💬 واتساب", del: "🗑 حذف الطلب", delSure: "اضغط مرة أخرى للتأكيد", deleted: "تم حذف الطلب",
+    f_phone: "الهاتف", f_business: "المحل / الصيدلية", f_wilaya: "الولاية", f_commune: "البلدية", f_delivery: "التوصيل", f_address: "العنوان",
+    f_note: "ملاحظة الزبون", f_qty: "الكمية", f_unit: "سعر الوحدة", f_items: "المنتجات", f_total: "المجموع",
+    f_created: "تاريخ الطلب", f_updated: "آخر تعديل",
+    status: "الحالة", tracking: "رقم التتبع", trackingPh: "رقم التتبع", notes: "ملاحظات داخلية",
+    feeLbl: "سعر التوصيل", feePh: "يُحدَّد عند التأكيد",
+    notesPh: "مثلاً: اتصلت مرتين، لم يرد", saving: "جاري الحفظ…", saved: "تم الحفظ ✓", saveFail: "لم يتم الحفظ: ",
+    bottles: "قارورة", plusDelivery: "+ التوصيل", cur: "دج", free: "مجاني", atConfirm: "يُحدَّد عند التأكيد",
+    s: { new: "جديد", no_answer: "لم يرد", confirmed: "مؤكد", shipped: "تم الشحن", delivered: "تم التسليم", returned: "مرتجع", cancelled: "ملغى" },
+    g_sales: "حالة البيع", openOn: "الطلبات مفتوحة: الزبائن يستطيعون الطلب", openOff: "الطلبات متوقفة: صفحة الطلب مغلقة",
+    f_closedMsg: "الرسالة التي تظهر عندما تكون الطلبات متوقفة", f_announce: "شريط إعلان أعلى صفحة الطلب (اتركه فارغاً لإخفائه)",
+    announcePh: "مثلاً: عرض خاص هذا الأسبوع، التوصيل مجاني",
+    g_price: "السعر والكمية", f_price: "سعر القارورة", f_old: "السعر القديم (مشطوب)", optional: "اختياري",
+    f_min: "أقل كمية للطلب", f_step: "الكمية تكون بمضاعفات", f_max: "أقصى كمية في طلب",
+    stepHint: "«بمضاعفات» = 1 يعني أي كمية. ضع مثلاً 12 إذا كنت تبيع بالكرتونة (12، 24، 36...).",
+    g_tiers: "أسعار الجملة حسب الكمية", tiersHint: "كلما وصل الزبون إلى كمية معيّنة ينخفض سعر القارورة لكامل الطلب. اتركها فارغة لسعر واحد.",
+    fromQty: "ابتداءً من (قارورة)", tierPrice: "سعر القارورة", addTier: "+ إضافة سعر جملة",
+    pvTitle: "هكذا يرى الزبون الأسعار:", pvFrom: (a, b) => b ? `من ${a} إلى ${b}` : `${a} فأكثر`,
+    g_delivery: "سعر التوصيل", deliveryHint: "اتركه فارغاً = «يُحدَّد عند التأكيد». ضع 0 = توصيل مجاني.",
+    f_home: "إلى المنزل / المحل", f_desk: "إلى مكتب التوصيل",
+    g_product: "المنتج", f_name: "اسم المنتج", f_pack: "وصف العبوة", f_pixel: "Meta Pixel ID (للإعلانات)",
+    lastSaved: d => `آخر حفظ للإعدادات: ${d}`,
+    saveSettings: "حفظ الإعدادات", discard: "إلغاء التغييرات", unsaved: "تغييرات غير محفوظة",
+    settingsSaved: "تم حفظ الإعدادات ✓ الصفحة تعرض الأسعار الجديدة الآن.",
+    e_price: "أدخل سعر القارورة.", e_min: "أدخل أقل كمية.", e_max: "أقصى كمية يجب أن تكون أكبر من أقل كمية.",
+    e_step: "«بمضاعفات» يجب أن يكون 1 أو أكثر.", e_tier: "كل سعر جملة يحتاج كمية وسعراً.", e_name: "أدخل اسم المنتج.",
+    e_pixel: "Pixel ID أرقام فقط.",
+    w_minStep: (m, s) => `انتبه: أقل كمية (${m}) ليست من مضاعفات ${s}.`,
+    w_tierUp: q => `انتبه: سعر الجملة من ${q} قارورة أعلى من سعر القارورة العادي أو من سعر أقل منه في الكمية.`,
+    w_tierBelowMin: q => `سعر الجملة من ${q} أقل من «أقل كمية»، لن يظهر للزبون.`,
+    w_dupTier: "يوجد سعرا جملة بنفس الكمية.",
+    g_account: "حسابي", who: e => `متصل كـ ${e}`, newPw: "كلمة سر جديدة (8 أحرف على الأقل)", newPw2: "أعد كتابة كلمة السر",
+    changePw: "تغيير كلمة السر", pwShort: "كلمة السر قصيرة (8 أحرف على الأقل).", pwDiff: "كلمتا السر غير متطابقتين.", pwOk: "تم تغيير كلمة السر ✓",
+    leave: "لديك تغييرات غير محفوظة في الإعدادات."
+  },
+  fr: {
+    dir: "ltr", admin: "Administration", login: "Connexion", loginSub: "Page réservée à l'administration.",
+    email: "Nom d'utilisateur", password: "Mot de passe", enter: "Se connecter",
+    badLogin: "Identifiant ou mot de passe incorrect.", noAccess: "Ce compte n'a pas accès.",
+    navOrders: "Commandes", navSettings: "Paramètres",
+    refresh: "Actualiser", logout: "Déconnexion", updated: "Actualisé", loadFail: "Impossible de charger les commandes : ",
+    today: "Aujourd'hui", d7: "7 derniers jours", d30: "30 derniers jours", all: "Tout", allTab: "Toutes",
+    search: "Rechercher : nom, commerce, téléphone, commune, n°…", export: "⬇ Export Excel",
+    closedBanner: "⚠ Les commandes sont fermées : les clients ne peuvent pas commander.", openSettings: "Ouvrir les paramètres",
+    st_orders: "Commandes", st_waiting: n => `${n} à appeler`,
+    st_conf: "Taux de confirmation", st_confSub: (a, b) => `${a} confirmées sur ${b}`,
+    st_del: "Taux de livraison", st_delSub: (a, b) => `${a} livrées, ${b} retours`,
+    st_rev: "Chiffre d'affaires (livrées)", st_pieces: n => `${n} flacon(s)`,
+    c_date: "Date", c_name: "Nom", c_phone: "Téléphone", c_place: "Wilaya / Commune",
+    c_delivery: "Livraison", c_qty: "Qté", c_total: "Montant", c_status: "Statut", c_tracking: "Suivi",
+    home: "Domicile", desk: "Stop desk", homeLong: "À domicile / au commerce", deskLong: "Stop desk (bureau de livraison)",
+    empty: "Aucune commande ici.", back: "← Retour aux commandes", notFound: "Commande introuvable.",
+    call: "📞 Appeler", whatsapp: "💬 WhatsApp", del: "🗑 Supprimer", delSure: "Cliquez encore pour confirmer", deleted: "Commande supprimée",
+    f_phone: "Téléphone", f_business: "Commerce / pharmacie", f_wilaya: "Wilaya", f_commune: "Commune", f_delivery: "Livraison", f_address: "Adresse",
+    f_note: "Note du client", f_qty: "Quantité", f_unit: "Prix unitaire", f_items: "Produits", f_total: "Total",
+    f_created: "Date de commande", f_updated: "Dernière modification",
+    status: "Statut", tracking: "N° de suivi", trackingPh: "N° de suivi", notes: "Notes internes",
+    feeLbl: "Frais de livraison", feePh: "Fixés à la confirmation",
+    notesPh: "Ex. : appelé deux fois, pas de réponse", saving: "Enregistrement…", saved: "Enregistré ✓", saveFail: "Non enregistré : ",
+    bottles: "flacon(s)", plusDelivery: "+ livraison", cur: "DA", free: "Gratuite", atConfirm: "Fixés à la confirmation",
+    s: { new: "Nouvelle", no_answer: "Pas de réponse", confirmed: "Confirmée", shipped: "Expédiée", delivered: "Livrée", returned: "Retour", cancelled: "Annulée" },
+    g_sales: "Ventes", openOn: "Commandes ouvertes : les clients peuvent commander", openOff: "Commandes fermées : la page de commande est bloquée",
+    f_closedMsg: "Message affiché quand les commandes sont fermées", f_announce: "Bandeau d'annonce en haut de la page (vide = masqué)",
+    announcePh: "Ex. : offre spéciale cette semaine, livraison gratuite",
+    g_price: "Prix et quantité", f_price: "Prix du flacon", f_old: "Ancien prix (barré)", optional: "facultatif",
+    f_min: "Quantité minimum", f_step: "Par multiples de", f_max: "Quantité maximum",
+    stepHint: "« Multiples de » = 1 : n'importe quelle quantité. Mettez 12 pour vendre par carton (12, 24, 36…).",
+    g_tiers: "Prix de gros par quantité", tiersHint: "À partir d'une certaine quantité, le prix du flacon baisse pour toute la commande. Laissez vide pour un prix unique.",
+    fromQty: "À partir de (flacons)", tierPrice: "Prix du flacon", addTier: "+ Ajouter un prix de gros",
+    pvTitle: "Ce que voit le client :", pvFrom: (a, b) => b ? `de ${a} à ${b}` : `${a} et plus`,
+    g_delivery: "Frais de livraison", deliveryHint: "Vide = « fixés à la confirmation ». 0 = livraison gratuite.",
+    f_home: "À domicile / au commerce", f_desk: "Stop desk",
+    g_product: "Produit", f_name: "Nom du produit", f_pack: "Conditionnement", f_pixel: "Meta Pixel ID (publicité)",
+    lastSaved: d => `Paramètres enregistrés le ${d}`,
+    saveSettings: "Enregistrer", discard: "Annuler les changements", unsaved: "Changements non enregistrés",
+    settingsSaved: "Paramètres enregistrés ✓ La page affiche déjà les nouveaux prix.",
+    e_price: "Entrez le prix du flacon.", e_min: "Entrez la quantité minimum.", e_max: "Le maximum doit être supérieur au minimum.",
+    e_step: "« Multiples de » doit être 1 ou plus.", e_tier: "Chaque prix de gros a besoin d'une quantité et d'un prix.", e_name: "Entrez le nom du produit.",
+    e_pixel: "Le Pixel ID ne contient que des chiffres.",
+    w_minStep: (m, s) => `Attention : le minimum (${m}) n'est pas un multiple de ${s}.`,
+    w_tierUp: q => `Attention : le prix à partir de ${q} est plus élevé que le prix normal ou qu'un palier inférieur.`,
+    w_tierBelowMin: q => `Le palier à partir de ${q} est sous le minimum : il ne sera pas affiché.`,
+    w_dupTier: "Deux paliers ont la même quantité.",
+    g_account: "Mon compte", who: e => `Connecté : ${e}`, newPw: "Nouveau mot de passe (8 caractères min.)", newPw2: "Répétez le mot de passe",
+    changePw: "Changer le mot de passe", pwShort: "Mot de passe trop court (8 caractères min.).", pwDiff: "Les mots de passe ne correspondent pas.", pwOk: "Mot de passe changé ✓",
+    leave: "Vous avez des paramètres non enregistrés."
+  },
+  en: {
+    dir: "ltr", admin: "Admin", login: "Sign in", loginSub: "This page is for administration only.",
+    email: "Username", password: "Password", enter: "Sign in",
+    badLogin: "Wrong username or password.", noAccess: "This account has no access.",
+    navOrders: "Orders", navSettings: "Settings",
+    refresh: "Refresh", logout: "Log out", updated: "Updated", loadFail: "Could not load orders: ",
+    today: "Today", d7: "Last 7 days", d30: "Last 30 days", all: "All time", allTab: "All",
+    search: "Search: name, shop, phone, commune, order #…", export: "⬇ Export Excel",
+    closedBanner: "⚠ Orders are closed: customers cannot order.", openSettings: "Open settings",
+    st_orders: "Orders", st_waiting: n => `${n} waiting for a call`,
+    st_conf: "Confirmation rate", st_confSub: (a, b) => `${a} confirmed of ${b}`,
+    st_del: "Delivery rate", st_delSub: (a, b) => `${a} delivered, ${b} returned`,
+    st_rev: "Revenue (delivered only)", st_pieces: n => `${n} bottle(s)`,
+    c_date: "Date", c_name: "Name", c_phone: "Phone", c_place: "Wilaya / Commune",
+    c_delivery: "Delivery", c_qty: "Qty", c_total: "Total", c_status: "Status", c_tracking: "Tracking",
+    home: "Home", desk: "Stop desk", homeLong: "Home / shop delivery", deskLong: "Stop desk (delivery office)",
+    empty: "No orders here.", back: "← Back to orders", notFound: "Order not found.",
+    call: "📞 Call", whatsapp: "💬 WhatsApp", del: "🗑 Delete order", delSure: "Click again to confirm", deleted: "Order deleted",
+    f_phone: "Phone", f_business: "Shop / pharmacy", f_wilaya: "Wilaya", f_commune: "Commune", f_delivery: "Delivery", f_address: "Address",
+    f_note: "Customer note", f_qty: "Quantity", f_unit: "Unit price", f_items: "Products", f_total: "Total",
+    f_created: "Ordered on", f_updated: "Last change",
+    status: "Status", tracking: "Tracking number", trackingPh: "Tracking number", notes: "Internal notes",
+    feeLbl: "Delivery fee", feePh: "Set at confirmation",
+    notesPh: "e.g. called twice, no answer", saving: "Saving…", saved: "Saved ✓", saveFail: "Not saved: ",
+    bottles: "bottle(s)", plusDelivery: "+ delivery", cur: "DA", free: "Free", atConfirm: "Set at confirmation",
+    s: { new: "New", no_answer: "No answer", confirmed: "Confirmed", shipped: "Shipped", delivered: "Delivered", returned: "Returned", cancelled: "Cancelled" },
+    g_sales: "Sales", openOn: "Orders open: customers can order", openOff: "Orders closed: the order page is blocked",
+    f_closedMsg: "Message shown while orders are closed", f_announce: "Announcement bar on top of the order page (empty = hidden)",
+    announcePh: "e.g. Special offer this week, free delivery",
+    g_price: "Price and quantity", f_price: "Price per bottle", f_old: "Old price (crossed out)", optional: "optional",
+    f_min: "Minimum order", f_step: "In multiples of", f_max: "Maximum per order",
+    stepHint: "\"Multiples of\" = 1 means any quantity. Use 12 to sell by the carton (12, 24, 36…).",
+    g_tiers: "Wholesale prices by quantity", tiersHint: "Once a customer reaches a quantity, the bottle price drops for the whole order. Leave empty for a single price.",
+    fromQty: "From (bottles)", tierPrice: "Price per bottle", addTier: "+ Add wholesale price",
+    pvTitle: "What the customer sees:", pvFrom: (a, b) => b ? `${a} to ${b}` : `${a} and more`,
+    g_delivery: "Delivery fees", deliveryHint: "Empty = \"set at confirmation\". 0 = free delivery.",
+    f_home: "Home / shop", f_desk: "Stop desk",
+    g_product: "Product", f_name: "Product name", f_pack: "Pack description", f_pixel: "Meta Pixel ID (ads)",
+    lastSaved: d => `Settings last saved ${d}`,
+    saveSettings: "Save settings", discard: "Discard changes", unsaved: "Unsaved changes",
+    settingsSaved: "Settings saved ✓ The order page already shows the new prices.",
+    e_price: "Enter the bottle price.", e_min: "Enter the minimum quantity.", e_max: "Maximum must be higher than the minimum.",
+    e_step: "\"Multiples of\" must be 1 or more.", e_tier: "Each wholesale price needs a quantity and a price.", e_name: "Enter the product name.",
+    e_pixel: "Pixel ID is digits only.",
+    w_minStep: (m, s) => `Careful: the minimum (${m}) is not a multiple of ${s}.`,
+    w_tierUp: q => `Careful: the price from ${q} bottles is higher than the normal price or a smaller tier.`,
+    w_tierBelowMin: q => `The tier from ${q} is below the minimum: customers won't see it.`,
+    w_dupTier: "Two tiers have the same quantity.",
+    g_account: "My account", who: e => `Signed in as ${e}`, newPw: "New password (8+ characters)", newPw2: "Repeat password",
+    changePw: "Change password", pwShort: "Password too short (8+ characters).", pwDiff: "Passwords don't match.", pwOk: "Password changed ✓",
+    leave: "You have unsaved settings."
+  }
+};
+const LANG_KEY = "healers_admin_lang";
+let lang = "ar";
+try { lang = localStorage.getItem(LANG_KEY) || "ar"; } catch (_) {}
+if (!T[lang]) lang = "ar";
+const t = () => T[lang];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = t().dir;
+  document.querySelectorAll("[data-t]").forEach(e => { e.textContent = t()[e.dataset.t]; });
+  document.querySelectorAll("[data-tp]").forEach(e => { e.placeholder = t()[e.dataset.tp]; });
+  document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang;
+  try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
+  applyLang();
+  $("#login-msg").textContent = "";
+  route();
+}));
+
+/* =================================================================
+   HELPERS
+   ================================================================= */
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const $ = s => document.querySelector(s);
+const fmt = n => Number(n || 0).toLocaleString("fr-FR").replace(/[   ]/g, " ");
+let orders = [];
+let settings = null;
+let settingsDirty = false;
+let currentTab = "all";
+let signedIn = false;
+let userEmail = "";
+let openedFromList = false;
+
+function el(tag, attrs = {}, ...children) {   // customer data always goes in as text, never as HTML
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null) continue;
+    if (k === "class") e.className = v;
+    else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  for (const c of children) if (c != null) e.append(c);
+  return e;
+}
+const num = v => el("bdi", { class: "n", text: String(v) });
+function money(n) { const f = document.createDocumentFragment(); f.append(num(fmt(n)), " " + t().cur); return f; }
+const badge = s => el("span", { class: `badge s-${s}`, text: t().s[s] || s });
+function when(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR") + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+function toast(text) {
+  const x = $("#toast"); x.textContent = text; x.hidden = false;
+  clearTimeout(toast.h); toast.h = setTimeout(() => x.hidden = true, 2800);
+}
+
+/* =================================================================
+   AUTH + ROUTING   (#o=12 = order 12, #settings = settings, empty = list)
+   ================================================================= */
+function showView(v) {
+  $("#login-view").hidden = v !== "login";
+  $("#list-view").hidden = v !== "list";
+  $("#detail-view").hidden = v !== "detail";
+  $("#settings-view").hidden = v !== "settings";
+  $("#refresh").hidden = $("#logout").hidden = $("#nav").hidden = v === "login";
+  $("#nav-orders").toggleAttribute("aria-current", v === "list" || v === "detail");
+  if (v === "list" || v === "detail") $("#nav-orders").setAttribute("aria-current", "page");
+  $("#nav-settings").toggleAttribute("aria-current", v === "settings");
+  if (v === "settings") $("#nav-settings").setAttribute("aria-current", "page");
+}
+function route() {
+  if (!signedIn) return showView("login");
+  const m = /^#o=(\d+)$/.exec(location.hash);
+  if (m) { showView("detail"); renderDetail(Number(m[1])); window.scrollTo(0, 0); }
+  else if (location.hash === "#settings") { showView("settings"); if (!settingsDirty) fillSettings(); }
+  else { showView("list"); renderList(); }
+}
+window.addEventListener("hashchange", route);
+window.addEventListener("beforeunload", e => { if (settingsDirty) { e.preventDefault(); e.returnValue = t().leave; } });
+
+async function start() {
+  const { data } = await db.auth.getSession();
+  if (!data.session) { signedIn = false; return route(); }
+  const { data: ok, error } = await db.rpc("is_admin");
+  if (error || !ok) {
+    await db.auth.signOut();
+    signedIn = false;
+    $("#login-msg").textContent = t().noAccess;
+    return route();
+  }
+  signedIn = true;
+  userEmail = data.session.user.email || "";
+  await Promise.all([load(), loadSettings()]);
+  route();
+}
+
+$("#login-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("#login-btn");
+  btn.disabled = true; $("#login-msg").textContent = "";
+  const idv = $("#email").value.trim();
+  const email = idv.includes("@") ? idv : idv.toLowerCase() + USER_DOMAIN;
+  const { error } = await db.auth.signInWithPassword({ email, password: $("#password").value });
+  btn.disabled = false;
+  if (error) { $("#login-msg").textContent = t().badLogin; return; }
+  $("#password").value = "";
+  start();
+});
+$("#logout").addEventListener("click", async () => {
+  settingsDirty = false;
+  await db.auth.signOut(); signedIn = false; orders = []; settings = null;
+  history.replaceState(null, "", location.pathname); route();
+});
+$("#refresh").addEventListener("click", async () => { await Promise.all([load(), loadSettings()]); route(); toast(t().updated); });
+$("#period").addEventListener("change", renderList);
+$("#search").addEventListener("input", renderList);
+
+/* =================================================================
+   DATA
+   ================================================================= */
+async function load() {
+  const { data, error } = await db.from("orders").select("*").order("created_at", { ascending: false }).range(0, 4999);
+  if (error) { toast(t().loadFail + error.message); return; }
+  orders = data || [];
+}
+async function loadSettings() {
+  const { data, error } = await db.from("settings").select("*").eq("id", 1).single();
+  if (error) { toast(t().loadFail + error.message); return; }
+  settings = data;
+  $("#closed-banner").hidden = settings.orders_open;
+}
+// refresh the list every minute while it is on screen
+setInterval(async () => { if (signedIn && !$("#list-view").hidden) { await load(); renderList(); } }, 60_000);
+
+async function save(order, changes, savedEl) {
+  savedEl.className = "saved"; savedEl.textContent = t().saving;
+  const { data, error } = await db.from("orders").update(changes).eq("id", order.id).select().single();
+  if (error) { savedEl.className = "saved err"; savedEl.textContent = t().saveFail + error.message; return false; }
+  Object.assign(order, data);
+  savedEl.textContent = t().saved;
+  return true;
+}
+
+/* =================================================================
+   LIST VIEW
+   ================================================================= */
+function inPeriod(o) {
+  const days = Number($("#period").value);
+  if (!days) return true;
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (days - 1));
+  return new Date(o.created_at) >= start;
+}
+function matches(o) {
+  const q = $("#search").value.trim().toLowerCase();
+  if (!q) return true;
+  return [o.id, o.customer_name, o.business_name, o.phone, o.wilaya, o.commune, o.address, o.tracking_number, o.notes, o.customer_note]
+    .some(v => String(v ?? "").toLowerCase().includes(q));
+}
+const visibleOrders = () => orders.filter(inPeriod).filter(o => (currentTab === "all" || o.status === currentTab) && matches(o));
+
+function renderList() {
+  const period = orders.filter(inPeriod);
+  renderStats(period);
+  renderTabs(period);
+  const shown = visibleOrders();
+  const tbody = $("#rows");
+  tbody.textContent = "";
+  $("#empty").hidden = shown.length > 0;
+  shown.forEach(o => {
+    const open = () => { openedFromList = true; location.hash = "o=" + o.id; };
+    const total = document.createDocumentFragment();
+    total.append(money(o.total_price));
+    if (o.delivery_fee === null) total.append(" +");
+    tbody.append(el("tr", { tabindex: "0", onclick: open, onkeydown: e => { if (e.key === "Enter") open(); } },
+      el("td", { class: "opt muted" }, num(o.id)),
+      el("td", { class: "opt muted" }, num(when(o.created_at))),
+      el("td", { class: "name", title: o.customer_name }, o.customer_name, o.business_name ? el("small", { text: o.business_name }) : null),
+      el("td", {}, num(o.phone)),
+      el("td", { class: "place", title: `${o.wilaya} · ${o.commune}` }, `${o.wilaya.replace(/^\d+ - /, "")} · ${o.commune}`),
+      el("td", { class: "opt" }, el("span", { class: `pill ${o.delivery_type === "desk" ? "desk" : "home"}`, text: o.delivery_type === "desk" ? t().desk : t().home })),
+      el("td", { class: "opt" }, num(o.quantity)),
+      el("td", { class: "opt" }, total),
+      el("td", {}, badge(o.status)),
+      el("td", { class: "opt muted" }, num(o.tracking_number || "—"))
+    ));
+  });
+}
+
+function renderStats(p) {
+  const count = s => p.filter(o => o.status === s).length;
+  const decided = p.filter(o => !["new", "no_answer"].includes(o.status)).length;
+  const conf = ["confirmed", "shipped", "delivered", "returned"].reduce((a, s) => a + count(s), 0);
+  const finished = count("delivered") + count("returned");
+  const delivered = p.filter(o => o.status === "delivered");
+  const pct = (a, b) => b ? Math.round(a * 100 / b) + "%" : "—";
+  const stat = (value, label, sub) => el("div", { class: "stat" }, el("b", {}, value), el("small", { text: label }), el("div", { class: "sub", text: sub }));
+  const box = $("#stats");
+  box.textContent = "";
+  box.append(
+    stat(num(p.length), t().st_orders, t().st_waiting(count("new") + count("no_answer"))),
+    stat(num(pct(conf, decided)), t().st_conf, t().st_confSub(conf, decided)),
+    stat(num(pct(count("delivered"), finished)), t().st_del, t().st_delSub(count("delivered"), count("returned"))),
+    stat(money(delivered.reduce((a, o) => a + o.total_price, 0)), t().st_rev, t().st_pieces(delivered.reduce((a, o) => a + o.quantity, 0)))
+  );
+}
+
+function renderTabs(p) {
+  const tabs = $("#tabs");
+  tabs.textContent = "";
+  ["all", ...STATUS_KEYS].forEach(key => {
+    const n = key === "all" ? p.length : p.filter(o => o.status === key).length;
+    tabs.append(el("button", {
+      class: "tab", type: "button", "aria-pressed": String(currentTab === key),
+      onclick: () => { currentTab = key; renderList(); }
+    }, key === "all" ? t().allTab : t().s[key], el("span", { class: "c", text: `(${n})` })));
+  });
+}
+
+/* CSV export of what is on screen (opens in Excel, UTF-8 with BOM for Arabic) */
+$("#export").addEventListener("click", () => {
+  const cols = ["id", "created_at", "status", "customer_name", "business_name", "phone", "wilaya", "commune", "delivery_type", "address",
+                "quantity", "unit_price", "items_total", "delivery_fee", "total_price", "tracking_number", "customer_note", "notes"];
+  const cell = v => {
+    let s = v == null ? "" : String(v);
+    if (/^[=+\-@]/.test(s)) s = "'" + s;   // never let a cell run as a formula
+    return /[",;\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [cols.join(";"), ...visibleOrders().map(o => cols.map(c => cell(c === "created_at" ? when(o[c]) : o[c])).join(";"))];
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: `healers-commandes-${new Date().toISOString().slice(0, 10)}.csv` });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+
+/* =================================================================
+   DETAIL VIEW
+   ================================================================= */
+function renderDetail(id) {
+  const box = $("#detail");
+  box.textContent = "";
+  box.append(el("button", { class: "back", type: "button", text: t().back, onclick: () => {
+    if (openedFromList) { openedFromList = false; history.back(); }
+    else { history.replaceState(null, "", location.pathname); route(); }
+  } }));
+  const o = orders.find(x => x.id === id);
+  if (!o) { box.append(el("div", { class: "panel" }, el("p", { text: t().notFound }))); return; }
+
+  const intl = "213" + String(o.phone).replace(/^0/, "");
+  const info = el("dl", { class: "info" });
+  const row = (label, ...value) => { const dd = el("dd", { dir: "auto" }, ...value); info.append(el("dt", { text: label }), dd); return dd; };
+  row(t().f_phone, num(o.phone));
+  if (o.business_name) row(t().f_business, o.business_name);
+  row(t().f_wilaya, o.wilaya);
+  row(t().f_commune, o.commune);
+  row(t().f_delivery, o.delivery_type === "desk" ? t().deskLong : t().homeLong);
+  if (o.delivery_type !== "desk") row(t().f_address, o.address);
+  if (o.customer_note) row(t().f_note, o.customer_note);
+  row(t().f_qty, num(o.quantity), " " + t().bottles);
+  row(t().f_unit, money(o.unit_price));
+  row(t().f_items, money(o.items_total));
+  const totalDd = row(t().f_total, "");
+  const paintTotal = () => {
+    totalDd.textContent = "";
+    totalDd.append(money(o.total_price), o.delivery_fee === null ? ` ${t().plusDelivery}` : "");
+  };
+  paintTotal();
+  row(t().f_created, num(when(o.created_at)));
+  const updatedDd = row(t().f_updated, num(when(o.updated_at)));
+
+  const savedEl = el("div", { class: "saved", role: "status" });
+  const statusSel = el("select", { id: "d-status" });
+  STATUS_KEYS.forEach(k => { const op = new Option(t().s[k], k); op.selected = k === o.status; statusSel.add(op); });
+  const tracking = el("input", { id: "d-tracking", value: o.tracking_number ?? "", placeholder: t().trackingPh, dir: "ltr" });
+  const fee = el("input", { id: "d-fee", type: "number", min: "0", inputmode: "numeric", value: o.delivery_fee ?? "", placeholder: t().feePh });
+  const notes = el("textarea", { id: "d-notes", placeholder: t().notesPh });
+  notes.value = o.notes ?? "";
+
+  const head = el("div", { class: "head" },
+    el("h2", {}, el("span", { text: o.customer_name }), " ", el("small", {}, num("#" + o.id))), badge(o.status));
+
+  async function update(changes) {
+    const ok = await save(o, changes, savedEl);
+    if (ok) {
+      head.lastChild.replaceWith(badge(o.status));
+      updatedDd.textContent = ""; updatedDd.append(num(when(o.updated_at)));
+      paintTotal();
+    }
+    return ok;
+  }
+  statusSel.addEventListener("change", async () => { if (!await update({ status: statusSel.value })) statusSel.value = o.status; });
+  tracking.addEventListener("change", () => update({ tracking_number: tracking.value.trim() || null }));
+  notes.addEventListener("change", () => update({ notes: notes.value.trim() || null }));
+  fee.addEventListener("change", async () => {
+    const raw = fee.value.trim();
+    const f = raw === "" ? null : Math.max(0, Math.round(Number(raw)));
+    if (raw !== "" && !Number.isFinite(f)) { fee.value = o.delivery_fee ?? ""; return; }
+    if (!await update({ delivery_fee: f, total_price: o.items_total + (f ?? 0) })) fee.value = o.delivery_fee ?? "";
+  });
+
+  // two-step delete (no browser pop-up)
+  let armed = false;
+  const delBtn = el("button", { type: "button", class: "del", text: t().del });
+  delBtn.addEventListener("click", async () => {
+    if (!armed) { armed = true; delBtn.textContent = t().delSure; setTimeout(() => { armed = false; delBtn.textContent = t().del; }, 4000); return; }
+    const { error } = await db.from("orders").delete().eq("id", o.id);
+    if (error) { toast(t().saveFail + error.message); return; }
+    orders = orders.filter(x => x.id !== o.id);
+    toast(t().deleted);
+    history.replaceState(null, "", location.pathname); route();
+  });
+
+  box.append(
+    el("div", { class: "panel" },
+      head,
+      info,
+      el("div", { class: "actions" },
+        el("a", { href: `tel:${o.phone}`, text: t().call }),
+        el("a", { href: `https://wa.me/${intl}`, target: "_blank", rel: "noopener", text: t().whatsapp }),
+        delBtn)),
+    el("div", { class: "panel" },
+      el("div", { class: "edit" },
+        el("div", {}, el("label", { for: "d-status", text: t().status }), statusSel),
+        el("div", {}, el("label", { for: "d-tracking", text: t().tracking }), tracking),
+        el("div", {}, el("label", { for: "d-fee", text: t().feeLbl + " (" + t().cur + ")" }), fee),
+        el("div", { class: "full" }, el("label", { for: "d-notes", text: t().notes }), notes)),
+      savedEl)
+  );
+}
+
+/* =================================================================
+   SETTINGS VIEW
+   ================================================================= */
+const sf = $("#settings-form");
+const intOrNull = v => { const s = String(v).trim(); if (s === "") return null; const n = Number(s); return Number.isFinite(n) ? Math.round(n) : NaN; };
+
+function tierRow(tier = { min_qty: "", unit_price: "" }) {
+  const q = el("input", { type: "number", min: "1", inputmode: "numeric", value: tier.min_qty, "data-k": "min_qty" });
+  const p = el("input", { type: "number", min: "1", inputmode: "numeric", value: tier.unit_price, "data-k": "unit_price" });
+  const r = el("div", { class: "tier-row" },
+    el("div", {}, el("label", { text: t().fromQty }), q),
+    el("div", {}, el("label", { text: t().tierPrice + " (" + t().cur + ")" }), p),
+    el("button", { type: "button", title: "×", text: "×", onclick: () => { r.remove(); markDirty(); } }));
+  return r;
+}
+
+function fillSettings() {
+  if (!settings) return;
+  const s = settings;
+  $("#s-open").checked = s.orders_open;
+  $("#s-closed").value = s.closed_message;
+  $("#s-announce").value = s.announcement;
+  $("#s-price").value = s.unit_price;
+  $("#s-old").value = s.old_price ?? "";
+  $("#s-min").value = s.min_qty;
+  $("#s-step").value = s.step_qty;
+  $("#s-max").value = s.max_qty;
+  $("#s-home").value = s.delivery_home ?? "";
+  $("#s-desk").value = s.delivery_desk ?? "";
+  $("#s-name").value = s.product_name;
+  $("#s-pack").value = s.pack_label;
+  $("#s-pixel").value = s.meta_pixel_id;
+  const box = $("#tiers"); box.textContent = "";
+  [...(s.tiers || [])].sort((a, b) => a.min_qty - b.min_qty).forEach(tr => box.append(tierRow(tr)));
+  $("#s-updated").textContent = t().lastSaved(when(s.updated_at));
+  $("#acc-who").textContent = t().who(userEmail);
+  settingsDirty = false;
+  $("#s-saved").className = "saved"; $("#s-saved").textContent = "";
+  refreshPreview();
+}
+
+function readSettings() {
+  const tiers = [...document.querySelectorAll("#tiers .tier-row")].map(r => ({
+    min_qty: intOrNull(r.querySelector('[data-k="min_qty"]').value),
+    unit_price: intOrNull(r.querySelector('[data-k="unit_price"]').value),
+  })).filter(x => !(x.min_qty === null && x.unit_price === null));
+  return {
+    orders_open: $("#s-open").checked,
+    closed_message: $("#s-closed").value.trim(),
+    announcement: $("#s-announce").value.trim(),
+    unit_price: intOrNull($("#s-price").value),
+    old_price: intOrNull($("#s-old").value),
+    min_qty: intOrNull($("#s-min").value),
+    step_qty: intOrNull($("#s-step").value),
+    max_qty: intOrNull($("#s-max").value),
+    delivery_home: intOrNull($("#s-home").value),
+    delivery_desk: intOrNull($("#s-desk").value),
+    product_name: $("#s-name").value.trim(),
+    pack_label: $("#s-pack").value.trim(),
+    meta_pixel_id: $("#s-pixel").value.trim(),
+    tiers: tiers.sort((a, b) => (a.min_qty ?? 0) - (b.min_qty ?? 0)),
+  };
+}
+
+function errorsOf(v) {
+  const ok = n => Number.isInteger(n) && n >= 1;
+  if (!ok(v.unit_price)) return t().e_price;
+  if (v.old_price !== null && !ok(v.old_price)) return t().e_price;
+  if (!ok(v.min_qty)) return t().e_min;
+  if (!ok(v.step_qty)) return t().e_step;
+  if (!ok(v.max_qty) || v.max_qty < v.min_qty) return t().e_max;
+  if (v.tiers.some(x => !ok(x.min_qty) || !ok(x.unit_price))) return t().e_tier;
+  if ([v.delivery_home, v.delivery_desk].some(x => x !== null && !(Number.isInteger(x) && x >= 0))) return t().e_price;
+  if (v.product_name.length < 2) return t().e_name;
+  if (!/^\d{0,20}$/.test(v.meta_pixel_id)) return t().e_pixel;
+  return "";
+}
+
+function warningsOf(v) {
+  const w = [];
+  if (Number.isInteger(v.min_qty) && Number.isInteger(v.step_qty) && v.step_qty > 1 && v.min_qty % v.step_qty) w.push(t().w_minStep(v.min_qty, v.step_qty));
+  const qs = v.tiers.map(x => x.min_qty);
+  if (new Set(qs).size !== qs.length) w.push(t().w_dupTier);
+  let prev = v.unit_price;
+  v.tiers.forEach(x => {
+    if (!Number.isInteger(x.min_qty) || !Number.isInteger(x.unit_price)) return;
+    if (x.min_qty <= v.min_qty) w.push(t().w_tierBelowMin(x.min_qty));
+    if (x.unit_price >= prev) w.push(t().w_tierUp(x.min_qty));
+    prev = Math.min(prev, x.unit_price);
+  });
+  return w;
+}
+
+function refreshPreview() {
+  const v = readSettings();
+  const pv = $("#preview"); pv.textContent = "";
+  $("#s-open-label").textContent = v.orders_open ? t().openOn : t().openOff;
+  $("#closed-msg-box").hidden = v.orders_open;
+  if (errorsOf(v)) { $("#warn").textContent = errorsOf(v); return; }
+  pv.append(el("strong", { text: t().pvTitle }));
+  const tb = el("tbody");
+  const rows = [{ min_qty: v.min_qty, unit_price: v.unit_price }, ...v.tiers.filter(x => x.min_qty > v.min_qty)];
+  rows.forEach((r, i) => {
+    const next = rows[i + 1];
+    tb.append(el("tr", {}, el("td", {}, `${t().pvFrom(r.min_qty, next ? next.min_qty - 1 : null)} ${t().bottles}`), el("td", {}, money(r.unit_price))));
+  });
+  pv.append(el("table", {}, tb));
+  $("#warn").textContent = warningsOf(v).join(" · ");
+}
+
+function markDirty() {
+  settingsDirty = true;
+  $("#s-saved").className = "saved err"; $("#s-saved").textContent = t().unsaved;
+  refreshPreview();
+}
+sf.addEventListener("input", e => { if (!e.target.closest(".panel:last-child")) markDirty(); });
+sf.addEventListener("change", e => { if (!e.target.closest(".panel:last-child")) markDirty(); });
+$("#add-tier").addEventListener("click", () => {
+  const rows = document.querySelectorAll("#tiers .tier-row");
+  if (rows.length >= 10) return;
+  const r = tierRow(); $("#tiers").append(r); r.querySelector("input").focus(); markDirty();
+});
+$("#s-reset").addEventListener("click", async () => { await loadSettings(); fillSettings(); });
+
+sf.addEventListener("submit", async e => {
+  e.preventDefault();
+  const v = readSettings();
+  const err = errorsOf(v);
+  const out = $("#s-saved");
+  if (err) { out.className = "saved err"; out.textContent = err; return; }
+  // drop duplicate thresholds (keep the cheapest) and tiers under the minimum are kept but harmless
+  const seen = new Map();
+  v.tiers.forEach(x => { if (!seen.has(x.min_qty) || seen.get(x.min_qty).unit_price > x.unit_price) seen.set(x.min_qty, x); });
+  v.tiers = [...seen.values()].sort((a, b) => a.min_qty - b.min_qty);
+  const btn = $("#s-save"); btn.disabled = true;
+  out.className = "saved"; out.textContent = t().saving;
+  const { data, error } = await db.from("settings").update(v).eq("id", 1).select().single();
+  btn.disabled = false;
+  if (error) { out.className = "saved err"; out.textContent = t().saveFail + error.message; return; }
+  settings = data;
+  $("#closed-banner").hidden = settings.orders_open;
+  fillSettings();
+  out.className = "saved"; out.textContent = t().settingsSaved;
+  toast(t().saved);
+});
+
+$("#pw-save").addEventListener("click", async () => {
+  const a = $("#pw1").value, b = $("#pw2").value, m = $("#pw-msg");
+  if (a.length < 8) { m.className = "saved err"; m.textContent = t().pwShort; return; }
+  if (a !== b) { m.className = "saved err"; m.textContent = t().pwDiff; return; }
+  m.className = "saved"; m.textContent = t().saving;
+  const { error } = await db.auth.updateUser({ password: a });
+  if (error) { m.className = "saved err"; m.textContent = t().saveFail + error.message; return; }
+  $("#pw1").value = $("#pw2").value = "";
+  m.textContent = t().pwOk;
+});
+
+applyLang();
+start();
+</script>
+</body>
+</html>
